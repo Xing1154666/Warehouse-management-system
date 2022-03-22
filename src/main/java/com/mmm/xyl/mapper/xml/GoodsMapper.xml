@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmm.xyl.mapper.GoodsMapper">
+<select id="selectGoods" resultType="com.mmm.xyl.vo.GoodsVo">
+    select  t.name name,t.unitPrice unitPrice,t.sort sort,(t.num-f.num) num,(t.price-f.price) price from
+    (SELECT name,sum(num) num,unitPrice,sort,sum(price) price FROM `goods` where typeId=1
+    <if test="inGoodsTime!=null and inGoodsTime!=''">
+        and inoutTime &gt; #{inGoodsTime}
+    </if>
+    <if test="outGoodsTime!=null and outGoodsTime!=''">
+        and  inoutTime &lt; #{outGoodsTime}
+    </if>
+    <if test="name!=null and name!=''">
+        and  name = #{name}
+    </if>
+    group by name
+) t left join
+(SELECT name,sum(num) num,unitPrice,sort,sum(price) price FROM `goods`  where typeId=2
+    <if test="inGoodsTime!=null and inGoodsTime!=''">
+        and inoutTime &gt; #{inGoodsTime}
+    </if>
+    <if test="outGoodsTime!=null and outGoodsTime!=''">
+        and  inoutTime &lt; #{outGoodsTime}
+    </if>
+    <if test="name!=null and name!=''">
+        and  name = #{name}
+    </if>
+group by name) f
+on t.name = f.name order by num ASC
+</select>
+</mapper>
